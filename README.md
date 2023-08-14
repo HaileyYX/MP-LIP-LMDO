@@ -18,6 +18,6 @@ df_data_info_cust = pd.read_excel('Instance10.xlsx', sheet_name='info_cust')
 
 -Instance10为小规模算例测试集示例，便于理解如何制作需要的实例数据集
 
-parameters中包含算法使用的参数，需要时对应修改
+-parameters中包含算法使用的参数，需要时对应修改
 
-classes、fuction_tools为代码使用定义的类、算子等，无须修改；配置在python同一个文件夹即可
+-classes、fuction_tools为代码使用定义的类、算子等，无须修改；配置在python同一个文件夹即可
