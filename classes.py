@@ -16,20 +16,10 @@ class Product:
         self.min_dist_wh = None  # 缓存距离最近的warehouse
         self.able_to_cover = set()  # 缓存可以分配的wh集合
 
-    def assigning_wh(self, wh):
-        """
-        分配仓库
-        :param wh:
-        :return:
-        """
+    def assigning_wh(self, wh)
         self.assign_to_wh = wh
 
     def assigning_ex(self, ex):
-        """
-        选择快运点
-        :param ex:
-        :return:
-        """
         self.assign_to_ex = ex
 
     def clear(self):
@@ -53,11 +43,6 @@ class WareHouse:
         self.type_travel_cost_part2 = np.zeros(len(hold_cost))  # 缓存当前仓库各产品类型的中心库运输成本
 
     def covering(self, prod):
-        """
-        覆盖产品prod
-        :param prod:
-        :return:
-        """
         self.cover_to.add(prod)
         self.max_s_level[prod.type] = np.max((self.max_s_level[prod.type], prod.s_level))
 
@@ -88,11 +73,6 @@ class Express:
         self.cover_prod = set()  # 服务的产品
 
     def covering(self, prod):
-        """
-        服务产品
-        :param prod:
-        :return:
-        """
         self.cover_prod.add(prod)
 
     def pop(self, prod):
