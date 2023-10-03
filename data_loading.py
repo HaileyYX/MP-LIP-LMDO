@@ -5,7 +5,6 @@ from classes import *
 import pandas as pd
 
 
-# 根据miu和s求b的函数
 def get_b(miu, s):
     b = 0
     for r in range(s):
@@ -13,18 +12,7 @@ def get_b(miu, s):
     return b
 
 
-# 单调递减函数二分法求变量值
 def binary_get(aim, func=get_b, s=0, lb=0., ub=1., tlr=0.01, precision=3):
-    """
-    aim:目标值y
-    func:y=f(x)的函数f
-    s:函数的额外参数
-    lb:x的下界
-    ub:x的上界
-    tlr:算法的精度，即y的精度
-    precision:返回的x保留几位小数
-    return:给定精度下目标值y在函数func下对应的x
-    """
     c = (lb + ub) / 2
     valc = func(c, s)
     if abs(valc - aim) < tlr:
@@ -44,7 +32,6 @@ def get_dist_per(x1, y1, x2, y2):
     return s
 
 
-# 获得距离矩阵
 def get_dist(group1, group2):
     dist_mat = np.zeros([len(group1), len(group2)])
     for i in range(len(group1)):
@@ -128,33 +115,16 @@ def data_loading(pr: Parameter):
             D[cust_n,prod_n] = d_n
             alpha[cust_n,prod_n] = alpha_n
             T[cust_n,prod_n] = t_n
-    """C_num = 1 # 中心库数量
-    J_num = 3 # 本地库备选点数量
-    I_num = 10 # 客户数量
-    M_num = 8 # 快运站集合（包含虚拟点）
-    virtual_num = J_num # 虚拟节点的数量，位置和本地库本选点一样
-    K_num = 3 # 备件数量
-
-    per_cost = [random.randint(1,6)*0.1 for _ in range(K_num)]"""
 
     C = {i for i in range(C_num)}
     I = {i for i in range(I_num)}
     J = {i for i in range(J_num)}
     M = {i for i in range(M_num)}
     K = {i for i in range(K_num)}
-
-    """c_coords = [(random.randint(0,100), random.randint(0,100))]
-    i_coords = [(random.randint(0,100), random.randint(0,100)) for _ in range(len(I))]
-    j_coords = [(random.randint(0,100), random.randint(0,100)) for _ in range(len(J))]
-    m_coords = [(random.randint(0,100), random.randint(0,100)) for _ in range(len(M)-virtual_num)] + j_coords
-    """
     dist_ci = get_dist(c_coords, i_coords)
     dist_jm = get_dist(j_coords, m_coords)
     dist_ji = get_dist(j_coords, i_coords)
 
-    """f = []
-    for j in range(len(J)):
-        f.append(random.randint(500,1500))"""
 
     c_4 = np.zeros([len(I), len(M), len(J), len(K)])
     for i in range(len(c_4)):
@@ -176,7 +146,7 @@ def data_loading(pr: Parameter):
 
     "t = np.random.randint(1,3, size=(len(J), len(K)))"
 
-    """v_1 = 1 # 本地库-快运点的行驶速度
+    """v_1 = 1 
     v_2 = [random.randint(10,20)*0.1 for _ in K]"""
     tao_jm = d_jm / v_1
     tao_jik = np.zeros((len(J), len(I), len(K)))
@@ -185,17 +155,17 @@ def data_loading(pr: Parameter):
 
     "alpha = np.random.random((len(I), len(K))).round(2)*0.5"
 
-    "t_res = [random.randint(1,10)*0.1+1 for _ in M] # 快运点m的服务相应时间"
+    "t_res = [random.randint(1,10)*0.1+1 for _ in M] "
 
     "T = np.ones((len(I), len(K))) * 80"
 
     "max_s = 5"
-    L = dict()  # 可用库存水平集合
+    L = dict()  
     for j in J:
         for k in K:
             L[j, k] = set(i + 1 for i in range(max_s))
 
-    omega = T  # 客户i对产品k要求的运输时间限制
+    omega = T  
 
     miu_lb = 0
     miu_ub = float(np.sum(D)) * 10
@@ -226,7 +196,6 @@ def data_loading(pr: Parameter):
                 if (b, j, k) not in bjk_i.keys():
                     bjk_i[b, j, k] = i
 
-    # 给定一个b,i,j,k,s，求对应的miu值
     miu = dict()
     for i in I:
         for j in J:
@@ -235,7 +204,6 @@ def data_loading(pr: Parameter):
                 for s in L[j, k]:
                     miu[i, j, k, s] = binary_get(b, s=s, lb=miu_lb, ub=miu_ub)
 
-    # 以上是复用代码
     pr.prod_type_num = K_num
     for i in range(J_num):
         wh = WareHouse(i, j_coords[i], f[i], list(h[i]), list(t[i]))
@@ -281,13 +249,9 @@ def data_loading(pr: Parameter):
     pr.v_ew = v_1
     pr.v_wp = v_2
 
-    # 为product缓存最近的warehouse
-    # TODO:可以设置按客户的产品集合优化
     for prod in pr.product_set:
         prod.min_dist_wh = pr.warehouse_list[np.argmin(pr.dist_wp[:, prod.num])]
-    # TODO:为wh缓存到达时间最快的ex
 
-    # 缓存可以分配给prod的wh集合
     for prod in pr.product_list:
         assert isinstance(prod, Product)
         for wh in pr.warehouse_list:
