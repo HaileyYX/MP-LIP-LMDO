@@ -102,8 +102,8 @@ class SolutionStructure:
 
 class SystemPara:
 
-    def __init__(self, location_t_start=100000, allocation_t_start=100000, location_rho=0.95, allocation_rho=0.98,
-                 location_t_end=10000, allocation_t_end=10000, r=0.55, bonus1=60, bonus2=30, bonus3=30, from_amount=15,
+    def __init__(self, location_t_start=100000, allocation_t_start=100000, location_rho=0.98, allocation_rho=0.99,
+                 location_t_end=10000, allocation_t_end=10000, r=0.55, bonus1=60, bonus2=30, bonus3=20, from_amount=15,
                  to_amount=10):
         self.location_t_start = location_t_start  # 初始温度
         self.allocation_t_start = allocation_t_start
