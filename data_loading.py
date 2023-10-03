@@ -170,8 +170,8 @@ def data_loading(pr: Parameter):
     miu_lb = 0
     miu_ub = float(np.sum(D)) * 10
 
-    J_ik = dict()  # 能服务客户i的所有本地库备选点集合
-    I_jk = dict()  # 本地库j能服务的所有客户集合
+    J_ik = dict()  
+    I_jk = dict()  
     for i in I:
         for j in J:
             for k in K:
