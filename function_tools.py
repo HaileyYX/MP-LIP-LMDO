@@ -115,14 +115,12 @@ def get_minus_travel(aim_list: list, pr: Parameter, implement=False):
             cost1_part1 = 0
             cost1_part2 = pr.dist_wp[wh.num, prod.num] * pr.vir_per_cost[prod.type]
         cost1 = (cost1_part1 + cost1_part2) * prod.d
-        # 计算直接移除该点带来的直接成本
         single_direct_cost = cost1
         direct_cost += single_direct_cost
     return direct_cost
 
 
 def get_minus_hold(aim_list: list, pr: Parameter, implement=False):
-
     cost = 0
     aim_set = set(aim_list)
     change_wh_set = {(prod.assign_to_wh, prod.type) for prod in aim_list}
@@ -206,7 +204,6 @@ def get_add_travel(aim_list: list, action_list, pr: Parameter, implement=False):
 
 
 def get_add_hold(aim_list: list, action_list: list, pr: Parameter, implement=False):
-    # 找到发生变化wh-type对，确定服务水平和需求量，然后定库存水平，可算持有成本
     wh_type_levels = dict()
     wh_type_add_d = dict()
     for i in range(len(aim_list)):
@@ -387,11 +384,9 @@ def perturb1_wh_random_remove(select_size, pr: Parameter):
         for wh in remove_wh:
             for prod in wh.cover_to:
                 remove_prod_set.add(prod)
-    # 应用当前移除策略
     implement_destroy(remove_prod_set, pr)
     for wh in remove_wh:
         pr.s.sequence.remove(wh)
-    # 使用regret-2插入
     repair1_regret_k(2, remove_prod_set, pr)
 
 
@@ -420,20 +415,17 @@ def perturb2_wh_random_exchange(select_size, pr: Parameter)
             add_wh = random.sample(list(must_select_set), 1)[0]
             assert isinstance(add_wh, WareHouse)
             add_wh.clear()
-            # 把remove_wh的所有prod转移到add_wh中，并在sequence中替换
-            # 移除
             remove_list = list(remove_wh.cover_to)
             implement_destroy(set(remove_list), pr)
             # 换location
             for i in range(len(pr.s.sequence)):
                 if pr.s.sequence[i] == remove_wh:
                     pr.s.sequence[i] = add_wh
-            # 修复
+        
             pr.s.cost += get_add_cost(remove_list, [add_wh for _ in range(len(remove_list))], pr, True)
             for prod in remove_list:
                 prod.assigning_wh(add_wh)
                 add_wh.covering(prod)
-                # 确定运输模式
                 best_ex = None
                 time_wp = pr.dist_wp[add_wh.num, prod.num] / pr.v_wp[prod.type]
                 if time_wp > prod.time_limit:
@@ -517,7 +509,6 @@ def repair_greedy(k, remove_set: set, pr: Parameter):
         pr.s.cost += get_add_cost([prod], [wh], pr, True)
         prod.assigning_wh(wh)
         wh.covering(prod)
-        # 确定运输模式
         best_ex = None
         time_wp = pr.dist_wp[wh.num, prod.num] / pr.v_wp[prod.type]
         if time_wp > prod.time_limit:
@@ -702,7 +693,6 @@ def location_iter(pr: Parameter):
                     thres_prob = math.exp((pr.base_s.cost - pr.s.cost) / temper)
                     sa_prob = random.random()
                     if sa_prob > thres_prob:
-                        # 不接受当前较差的解，下次扰动仍然基于base解迭代
                         pr.s = pr.base_s.restore_solution()
                     else:
                         pr.base_s = SolutionStructure(pr.s, pr)
