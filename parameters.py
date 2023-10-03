@@ -17,12 +17,12 @@ class Parameter:
         self.express_set = set()  # 快运点集合
         self.express_list = list()  # 快运点列表s
         self.per_cost = list()  # 各类product的单位距离运输成本
-        self.vir_per_cost = list()  # 使用虚拟节点运输时（快运点和中心库），各类product的单位距离运输成本
-        self.dist_cp = None  # center到product对应的customer的距离矩阵
-        self.dist_ew = None  # express到warehouse的距离矩阵
-        self.dist_wp = None  # warehouse到product对应的customer的距离矩阵
-        self.v_ew = 0  # 从express到warehouse的行驶速度
-        self.v_wp = list()  # 从warehouse到不同product的行驶速度
+        self.vir_per_cost = list() 
+        self.dist_cp = None 
+        self.dist_ew = None 
+        self.dist_wp = None  
+        self.v_ew = 0  
+        self.v_wp = list()  
         self.big_M = 1000000
         self.io_to = None
 
@@ -36,14 +36,11 @@ class Parameter:
 
 class Solution:
     def __init__(self):
-        self.sequence = list()  # 储存开放了的warehouse
+        self.sequence = list()  
         self.cost = math.inf
 
 
 class SolutionStructure:
-    """
-    保存solution的内容
-    """
 
     def __init__(self, s: Solution, pr: Parameter):
         location = list()
@@ -60,11 +57,11 @@ class SolutionStructure:
                 if prod.assign_to_ex is not None:
                     allocation_pe[(prod.num, prod.type)] = prod.assign_to_ex.num
 
-        self.cost = s.cost  # 成本
-        self.location = location  # 开放决策
-        self.allocation_pw = allocation_pw  # 产品-仓库分配决策
-        self.allocation_pe = allocation_pe  # 产品-快运点分配决策
-        self.stocks = stocks  # 库存决策
+        self.cost = s.cost  
+        self.location = location  
+        self.allocation_pw = allocation_pw 
+        self.allocation_pe = allocation_pe
+        self.stocks = stocks 
         self.pr = pr
 
     def restore_solution(self):
@@ -115,16 +112,16 @@ class SystemPara:
         self.bonus1 = bonus1  # 最高分数奖励
         self.bonus2 = bonus2  # 次高分数奖励
         self.bonus3 = bonus3  # 最低分数奖励
-        self.from_amount = from_amount  # allocation的两个算子from参数
-        self.to_amount = to_amount  # allocation的两个算子to参数
-        self.location_op_scores = [0, 0]  # location算子的得分
-        self.location_op_weights = [0, 0]  # location算子的权重
-        self.location_op_weights_to1 = [0.5, 0.5]  # location算子归一化的权重
-        self.location_op_counts = [0, 0]  # location算子本轮执行次数
-        self.allocation_op_scores = [0, 0]  # allocation算子的得分
-        self.allocation_op_weights = [0.5, 0.5]  # allocation算子的权重
-        self.allocation_op_weights_to1 = [0.5, 0.5]  # allocation算子归一化的权重
-        self.allocation_op_counts = [0, 0]  # allocation算子本轮执行次数
+        self.from_amount = from_amount 
+        self.to_amount = to_amount 
+        self.location_op_scores = [0, 0]  
+        self.location_op_weights = [0, 0]  
+        self.location_op_weights_to1 = [0.5, 0.5] 
+        self.location_op_counts = [0, 0] 
+        self.allocation_op_scores = [0, 0] 
+        self.allocation_op_weights = [0.5, 0.5] 
+        self.allocation_op_weights_to1 = [0.5, 0.5]  
+        self.allocation_op_counts = [0, 0] 
 
     def computing_location_weights_to1(self):
         sum_weight = sum(self.location_op_weights)
