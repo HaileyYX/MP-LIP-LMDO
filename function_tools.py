@@ -726,7 +726,7 @@ def allocation_iter(sp: SystemPara, pr: Parameter):
                 check(pr)
                 # log_out_remove(pr.io_to, remove_set)
                 implement_destroy(remove_set, pr)
-                if random.random() > 0.05:
+                if random.random() > 0.5:
                     repair_greedy(1, remove_set, pr)
                 else:
                     repair1_regret_k(2, remove_set, pr)
