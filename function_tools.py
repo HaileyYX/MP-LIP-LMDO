@@ -177,7 +177,6 @@ def get_add_travel(aim_list: list, action_list, pr: Parameter, implement=False):
         wh = action_list[i]
         assert isinstance(prod, Product)
         assert isinstance(wh, WareHouse)
-        # 确定运输模式
         time_wp = pr.dist_wp[wh.num, prod.num] / pr.v_wp[prod.type]
         if time_wp > prod.time_limit:
             return pr.big_M
@@ -250,21 +249,10 @@ def get_add_cost(aim_list: list, action_list: list, pr: Parameter, implement=Fal
     cost1 = get_add_travel(aim_list, action_list, pr, implement)
     cost2 = get_add_hold(aim_list, action_list, pr, implement)
     cost3 = get_add_open(aim_list, action_list, pr)
-    """if implement:
-        print("增加的运输成本为：", cost1)
-        print("增加的持有成本为：", cost2)
-        print("增加的开放成本为：", cost3)"""
     return cost1 + cost2 + cost3
 
 
 def greedy_heuristic(pr: Parameter):
-    """for prod in pr.product_set:
-        assert isinstance(prod, Product)
-        wh = prod.min_dist_wh
-        assert isinstance(wh, WareHouse)
-        prod.assigning_wh(wh)
-        wh.covering(prod)"""
-
     for prod_list in pr.product_type_list:
         num_one_type = len(prod_list)
         max_cover = int(math.ceil(num_one_type / len(pr.warehouse_list)))
@@ -417,7 +405,6 @@ def perturb2_wh_random_exchange(select_size, pr: Parameter)
             add_wh.clear()
             remove_list = list(remove_wh.cover_to)
             implement_destroy(set(remove_list), pr)
-            # 换location
             for i in range(len(pr.s.sequence)):
                 if pr.s.sequence[i] == remove_wh:
                     pr.s.sequence[i] = add_wh
@@ -530,7 +517,6 @@ def repair_greedy(k, remove_set: set, pr: Parameter):
 def repair1_regret_k(k: int, remove_set: set, pr: Parameter)
 
     def update_info(best_prod_wh1, max_regret1, prod1, wh_dict):
-
         sorted_blocks = [Block(wh1, cost1) for (wh1, cost1) in wh_dict.items()]
         sorted_blocks.sort()
         sorted_blocks = sorted_blocks[: min(len(sorted_blocks), k)]
@@ -638,7 +624,6 @@ def allocation_iter(sp: SystemPara, pr: Parameter):
                     thres_prob = math.exp((last_s_struct.cost - pr.s.cost) / temper)
                     sa_prob = random.random()
                     if sa_prob > thres_prob:
-                        # 不接受当前较差的解
                         pr.s = last_s_struct.restore_solution()
                 check(pr)
                 sp.updating_allocation_score(level, i)
@@ -726,12 +711,6 @@ def solution_output(bks: SolutionStructure):
 
 
 def log_out_complete(to: _io.TextIOWrapper, pr: Parameter):
-    """
-    打印完整的信息
-    :param to:
-    :param pr:
-    :return:
-    """
     for wh in pr.s.sequence:
         to.writelines(str(wh))
         to.writelines("\n")
@@ -794,9 +773,6 @@ class Block:
 
 
 class TopK:
-    """
-    最大的topK
-    """
 
     def __init__(self, k):
         self.k = k
