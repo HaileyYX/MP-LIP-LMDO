@@ -62,7 +62,6 @@ class WareHouse:
         self.max_s_level[prod.type] = np.max((self.max_s_level[prod.type], prod.s_level))
 
     def pop(self, prod):
-        # todo:在使用优先队列储存客户后，可以进行优化
         self.cover_to.remove(prod)
         self.max_s_level[prod.type] = 0
         for now_prod in self.cover_to:
