@@ -9,11 +9,7 @@ from classes import *
 
 
 def check_relationship(pr: Parameter):
-    """
-    检查prod和wh以及prod和ex的分配关系是否一致
-    :param pr:
-    :return:
-    """
+
     for prod in pr.product_list:
         assert isinstance(prod, Product)
         wh = prod.assign_to_wh
@@ -34,13 +30,7 @@ def check_relationship(pr: Parameter):
 
 
 def get_cost(s: list, pr: Parameter, implement=False):
-    """
-    求给定解结构s的成本
-    :param implement:
-    :param pr:
-    :param s: 属性sequence
-    :return:
-    """
+
     cost1 = get_open_cost(s)
     cost2 = get_hold_cost(s)
     cost3 = get_travel_cost(s, pr, implement)
@@ -49,11 +39,7 @@ def get_cost(s: list, pr: Parameter, implement=False):
 
 
 def get_open_cost(s: list):
-    """
-    求给定解结构s的开放成本
-    :param s:
-    :return:
-    """
+
     cost = 0
     for wh in s:
         if len(wh.cover_to) != 0:
@@ -62,13 +48,6 @@ def get_open_cost(s: list):
 
 
 def get_travel_cost(s: list, pr: Parameter, implement=False):
-    """
-    求给定解结构s的运输成本
-    :param implement:
-    :param pr:
-    :param s:
-    :return:
-    """
     cost = 0
     for wh in s:
         assert isinstance(wh, WareHouse)
@@ -86,11 +65,7 @@ def get_travel_cost(s: list, pr: Parameter, implement=False):
 
 
 def get_hold_cost(s: list):
-    """
-    求给定解结构s的持有成本
-    :param s:
-    :return:
-    """
+  
     cost = 0
     for wh in s:
         assert isinstance(wh, WareHouse)
@@ -99,13 +74,7 @@ def get_hold_cost(s: list):
 
 
 def get_min_s(s_level, demand_sum, max_d_table):
-    """
-    求符合条件的最小库存
-    :param s_level: 该warehouse需要提供的最小服务水平
-    :param demand_sum: 该warehouse服务的产品的需求和
-    :param max_d_table: 根据服务水平和库存水平可以查库存水平的表
-    :return:
-    """
+
 
     def binary_search(l, r, aim, s_demand_list):
         if r == l:
@@ -131,16 +100,7 @@ def get_min_s(s_level, demand_sum, max_d_table):
 
 
 def get_minus_travel(aim_list: list, pr: Parameter, implement=False):
-    """
-    解可行状态下，
-    获得指定产品列表的运输成本变动列表（将产品按照当前分配方案的运输成本，千万别忘了运输成本是期望成本）
-    直接成本是指这个产品的运输成本，包含从本地库运输的成本+从中心库运输的成本，
-    间接成本是指该产品导致的仓库服务水平变化从而导致期望权重的变化带来的成本
-    :param implement:是否更新wh缓存的行驶成本
-    :param aim_list:
-    :param pr:
-    :return:
-    """
+
     direct_cost = 0
     for prod in aim_list:
         assert isinstance(prod, Product)
@@ -162,16 +122,7 @@ def get_minus_travel(aim_list: list, pr: Parameter, implement=False):
 
 
 def get_minus_hold(aim_list: list, pr: Parameter, implement=False):
-    """
-    解可行状态下，求指定产品列表变动导致的持有成本的变动
-    暂时只能给移除操作用
-    :param implement: 控制库存水平变量是否发生变化
-    :param aim_list:
-    :param pr:
-    :return:
-    """
-    # TODO:给wh设置优先队列储存被服务的产品可降低复杂度。要计算对于一个仓库的不同产品的服务水平，可优化空间较大
-    # TODO：可添加wh的平均需求优化复杂度
+
     cost = 0
     aim_set = set(aim_list)
     change_wh_set = {(prod.assign_to_wh, prod.type) for prod in aim_list}
@@ -220,16 +171,7 @@ def get_minus_cost(aim_list: list, pr: Parameter, implement=False):
 
 
 def get_add_travel(aim_list: list, action_list, pr: Parameter, implement=False):
-    """
-    在解的结构不完整的情况下，计算变动后的运输成本的增量，包括直接成本+间接成本
-    :param implement:
-    :param aim_list:
-    :param action_list:
-    :param pr:
-    :return:
-    """
-    # 先确定运输模式（ex，wh，不能运）,再考虑当前服务水平下运输成本的增量
-    # todo：确定ex时能否优化？
+
     assign_to_ex_list = []
     direct_cost = 0  # 直接运输成本
     for i in range(len(aim_list)):
@@ -319,7 +261,6 @@ def get_add_cost(aim_list: list, action_list: list, pr: Parameter, implement=Fal
 
 
 def greedy_heuristic(pr: Parameter):
-    # 按照距离最近原则为仓库分配产品
     """for prod in pr.product_set:
         assert isinstance(prod, Product)
         wh = prod.min_dist_wh
@@ -350,12 +291,10 @@ def greedy_heuristic(pr: Parameter):
                 if ite >= len(pr.warehouse_list):
                     Exception("平均分配方案也不行")
 
-    # 形成一个解
     pr.s = Solution()
     for wh in pr.warehouse_list:
         if len(wh.cover_to) != 0:
             pr.s.sequence.append(wh)
-    # 定库存。选择仓库里服务水平的最大值，需求和
     for wh in pr.s.sequence:
         assert isinstance(wh, WareHouse)
         demand_sum = np.zeros(pr.prod_type_num)
@@ -370,8 +309,6 @@ def greedy_heuristic(pr: Parameter):
                     wh.stock[i] = get_min_s(wh.max_s_level[i], demand_sum[i], pr.max_demands)
                 except Exception:
                     wh.stock[i] = 100000000
-    # 确定运输方式，能第三方则第三方，不能则直送（product的对应属性为None）
-    # TODO:可以设置按客户的产品集合优化
     for prod in pr.product_set:
         assert isinstance(prod, Product)
         v2 = pr.v_wp[prod.type]
@@ -398,13 +335,6 @@ def greedy_heuristic(pr: Parameter):
 
 
 def destroy1_random(from_size, size: int, pr: Parameter):
-    """
-    随机移除指定数量产品（仅生成集合，不进行操作）
-    :param from_size:
-    :param pr:
-    :param size: 移除数量
-    :return:
-    """
     return set(random.sample(pr.product_list, size))
 
 
@@ -424,13 +354,6 @@ def destroy2_greedy_random(from_size: int, select_size: int, pr: Parameter):
 
 
 def perturb1_wh_random_remove(select_size, pr: Parameter):
-    """
-    随机移除一个wh
-    :param select_size:
-    :param pr:
-    :return:
-    """
-    # 事先形成约束集合，用于判断移除的仓库后能否产生可行解
     assert select_size == 1
     for wh in pr.s.sequence:
         wh.must_open = False
@@ -472,13 +395,11 @@ def perturb1_wh_random_remove(select_size, pr: Parameter):
     repair1_regret_k(2, remove_prod_set, pr)
 
 
-def perturb2_wh_random_exchange(select_size, pr: Parameter):
-    # todo:不能把移除仓库的所有产品全部导入到新开仓库的所有产品，这样会导致不可行
-    # 当前版本select_size只能为1
+def perturb2_wh_random_exchange(select_size, pr: Parameter)
     assert select_size == 1
-    able_to_change_list = pr.s.sequence[:]  # 可以移除的（就是开了的）
-    close_wh_set = set()  # 没开的集合
-    open_wh_set = set(pr.s.sequence)  # 开了的集合
+    able_to_change_list = pr.s.sequence[:] 
+    close_wh_set = set() 
+    open_wh_set = set(pr.s.sequence) 
     for wh in pr.warehouse_list:
         assert isinstance(wh, WareHouse)
         if wh not in open_wh_set:
@@ -488,8 +409,7 @@ def perturb2_wh_random_exchange(select_size, pr: Parameter):
         assert isinstance(remove_wh, WareHouse)
         open_wh_set.remove(remove_wh)
         able_to_change_list.remove(remove_wh)
-        # 找到必须选中的集合
-        # 如果该产品可以分配的wh集合和当前开放集合没有交集，则需要在可以开放的集合中选一个
+
         must_select_set = close_wh_set.copy()
         for prod in remove_wh.cover_to:
             assert isinstance(prod, Product)
@@ -535,7 +455,6 @@ def perturb2_wh_random_exchange(select_size, pr: Parameter):
 
 def perturb3_wh_random_add(select_size, pr: Parameter):
     assert select_size == 1
-    # 随机选择一个wh开放，记录开放总数，再从各wh中选择（1/开放总数）向下取整个最差的prod分配给该仓库
     close_wh_list = list()
     open_wh_set = set(pr.s.sequence)
     for wh in pr.warehouse_list:
@@ -560,13 +479,6 @@ def perturb3_wh_random_add(select_size, pr: Parameter):
 
 
 def implement_destroy(remove_set: set, pr: Parameter):
-    """
-    应用移除操作，修改相应的数据，调整成本
-    :param remove_set:
-    :param pr:
-    :return:
-    """
-    # todo:可以对wh储存的prod按s_level用优先队列，能有效降低复杂度
     delta_cost = get_minus_cost(list(remove_set), pr, True)
     pr.s.cost -= delta_cost
     for prod in remove_set:
@@ -624,20 +536,10 @@ def repair_greedy(k, remove_set: set, pr: Parameter):
             best_ex.covering(prod)
 
 
-def repair1_regret_k(k: int, remove_set: set, pr: Parameter):
-    # 注意每次插入的时候成本的变化：库存成本+运输成本（直接和间接）+开放成本（简单考虑插入的成本增量）
-    # todo:如果k=1，则可以通过当计算到value为0时，直接开始执行插入
+def repair1_regret_k(k: int, remove_set: set, pr: Parameter)
 
     def update_info(best_prod_wh1, max_regret1, prod1, wh_dict):
-        """
-        加入给定产品后，更新后悔值最大的产品-仓库对
-        :param best_prod_wh1:
-        :param max_regret1:
-        :param prod1:
-        :param wh_dict:
-        :return:
-        """
-        # 由于仓库数量较少，因此不用小根堆实现topK，直接用字典保存，然后排序得topK
+
         sorted_blocks = [Block(wh1, cost1) for (wh1, cost1) in wh_dict.items()]
         sorted_blocks.sort()
         sorted_blocks = sorted_blocks[: min(len(sorted_blocks), k)]
@@ -660,14 +562,12 @@ def repair1_regret_k(k: int, remove_set: set, pr: Parameter):
             prod_wh_dict[prod][wh] = cost
         best_prod_wh, max_regret = update_info(best_prod_wh, max_regret, prod, prod_wh_dict[prod])
     while True:
-        # 执行插入，更新信息
         prod, wh = best_prod_wh
         assert isinstance(prod, Product)
         assert isinstance(wh, WareHouse)
         pr.s.cost += get_add_cost([prod], [wh], pr, True)
         prod.assigning_wh(wh)
         wh.covering(prod)
-        # 确定运输模式
         best_ex = None
         time_wp = pr.dist_wp[wh.num, prod.num] / pr.v_wp[prod.type]
         if time_wp > prod.time_limit:
@@ -709,7 +609,7 @@ def repair1_regret_k(k: int, remove_set: set, pr: Parameter):
 def allocation_iter(sp: SystemPara, pr: Parameter):
     temper = sp.allocation_t_start
     funcs = [destroy1_random, destroy2_greedy_random]
-    improve_level = 2  # 评价location扰动的改进水平，0最好，2最差
+    improve_level = 2 
     while temper >= sp.allocation_t_end:
         prob = random.random()
         acc_prob = 0
@@ -820,7 +720,6 @@ def location_iter(pr: Parameter):
 
 
 def solution_output(bks: SolutionStructure):
-    # 分配方案
     lis = []
     for prod_num, p_type in bks.allocation_pw:
         wh_num = bks.allocation_pw[prod_num, p_type]
